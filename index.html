@@ -141,9 +141,22 @@
       </div>
     </section>
   </main>
+  <div class="mobile-cta" role="region" aria-label="Actions">
+    <div class="mobile-bar">
+      <button class="primary" onclick="document.getElementById(''rollBtn'').click()">Roll</button>
+      <button class="secondary" onclick="document.getElementById(''rerollBtn'').click()">Reroll</button>
+      <div class="presets" aria-label="Presets">
+        <button class="ghost" onclick="document.querySelector('[data-preset=\'1,1\']').click()">1v1</button>
+        <button class="ghost" onclick="document.querySelector('[data-preset=\'3,2\']').click()">3v2</button>
+        <button class="ghost" onclick="document.querySelector('[data-preset=\'4,2\']').click()">4v2</button>
+        <button class="ghost" onclick="document.querySelector('[data-preset=\'20,20\']').click()">20v20</button>
+      </div>
+    </div>
+  </div>
   <script src="dist/bundle.js"></script>
 </body>
 </html>
+
 
 
 
