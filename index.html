@@ -38,6 +38,38 @@
 
     .steps { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; background:#0b0f15; border:1px solid #1a2230; border-radius:8px; padding:10px; white-space:pre-wrap; }
   </style>
+  <meta name=\"theme-color\" content=\"#0f1216\">
+  <meta name=\"color-scheme\" content=\"dark\">  <style>
+    /* Responsive enhancements */
+    :root { --space: 14px; --radius: 10px; }
+    body { font-size: clamp(14px, 1.2vw + 0.25rem, 16px); }
+    header { position: sticky; top: 0; z-index: 10; backdrop-filter: saturate(140%) blur(6px); background: linear-gradient(180deg, rgba(15,18,22,0.95), rgba(15,18,22,0.85)); }
+    main { container-type: inline-size; }
+    .btns { gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+    .btns::-webkit-scrollbar { height: 6px; }
+    .btns::-webkit-scrollbar-thumb { background: #253147; border-radius: 4px; }
+    button, .btns button { min-height: 42px; }
+    input[type=number], input[type=text] { min-height: 44px; font-size: 16px; }
+    .kv { grid-template-columns: 1fr 1fr; }
+    @media (min-width: 500px) { .kv { grid-template-columns: 160px 1fr; } }
+    /* Dice wrap for small screens */
+    .dice-row { gap: 6px; }
+    .dice-row .die-wrap { width: 40px; height: 40px; }
+    @media (min-width: 480px) { .dice-row .die-wrap { width: 48px; height: 48px; } }
+    /* Mobile action bar */
+    .mobile-cta { display: none; }
+    @media (max-width: 700px) {
+      body { padding-bottom: 92px; }
+      .mobile-cta { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: max(8px, env(safe-area-inset-bottom)) 10px 10px; background: rgba(10,14,20,0.86); backdrop-filter: blur(8px); border-top: 1px solid #1e2633; }
+      .mobile-cta .mobile-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; }
+      .mobile-cta .presets { grid-column: 1 / -1; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+      .mobile-cta button.primary { background:#1d83ff; color:#fff; }
+    }
+    /* Landscape wide screens: center content */
+    @media (min-width: 1200px) {
+      main { max-width: 1200px; margin: 0 auto; }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -112,6 +144,7 @@
   <script src="dist/bundle.js"></script>
 </body>
 </html>
+
 
 
 
