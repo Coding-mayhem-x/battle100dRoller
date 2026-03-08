@@ -1,0 +1,58 @@
+﻿name: Deploy Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install TypeScript
+        run: npm install --no-fund --no-audit --save-dev typescript
+
+      - name: Compile TypeScript
+        run: npx tsc -p tsconfig.json
+
+      - name: Bundle for file protocol
+        run: node scripts/build-bundle.mjs
+
+      - name: Prepare site
+        run: |
+          mkdir -p site
+          cp index.html site/
+          mkdir -p site/dist
+          cp -r dist/* site/dist/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,117 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Battle d100 Offline</title>
+  <meta name="description" content="Unified d100 threshold battle calculator">
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; font-family: system-ui, Segoe UI, Roboto, sans-serif; background: #0f1216; color: #e8eef6; }
+    header { padding: 16px 20px; border-bottom: 1px solid #1e2633; display:flex; align-items:center; gap:12px; }
+    header h1 { font-size: 18px; margin: 0; letter-spacing: 0.3px; font-weight: 600; }
+    main { padding: 16px 20px; display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+    .card { background: #121821; border: 1px solid #1e2633; border-radius: 10px; padding: 14px; }
+    .controls label { display: block; font-size: 12px; opacity: .9; margin-bottom: 6px; }
+    .row { display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
+    .field { flex:1; min-width: 120px; }
+    input[type=number], input[type=text] { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 8px; border: 1px solid #2a3547; background: #0c1118; color: #e8eef6; font-weight: 600; }
+    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    button { appearance: none; background: #1d83ff; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; box-shadow: 0 0 0 0 rgba(29,131,255,.4); transition: box-shadow .2s, background .2s; }
+    button:hover { background: #2a8cff; box-shadow: 0 0 0 3px rgba(29,131,255,.2); }
+    button.secondary { background: #223047; color: #c8d6ee; }
+    button.ghost { background: transparent; border: 1px solid #2a3547; color:#c8d6ee; }
+    .btns { display:flex; flex-wrap: wrap; gap: 8px; }
+
+    .results .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 700px) { .results .grid { grid-template-columns: 1fr; } }
+    .panel h3 { margin:0 0 8px; font-size: 13px; font-weight: 700; color: #c4d7ff; letter-spacing:.3px; }
+    .kv { display:grid; grid-template-columns: 160px 1fr; gap: 6px; margin-bottom: 8px; font-size: 13px; }
+    .kv span:nth-child(odd) { color:#89a9ff; opacity:.9; }
+
+    .dice-row { display:flex; flex-wrap:wrap; gap: 8px; }
+    .dice-row .die-wrap { width: 48px; height: 48px; }
+    .note { font-size: 12px; opacity: .8; }
+    .winner { color: #2be3a0; font-weight: 800; }
+    .loser { color: #ff7d7d; font-weight: 800; }
+
+    .steps { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; background:#0b0f15; border:1px solid #1a2230; border-radius:8px; padding:10px; white-space:pre-wrap; }
+  </style>
+</head>
+<body>
+  <header>
+    <svg width="22" height="22" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M24 4L42 16V32L24 44L6 32V16L24 4Z" fill="#1d83ff" opacity="0.2"/>
+      <path d="M24 4L42 16L24 28L6 16L24 4Z" fill="#1d83ff" opacity="0.35"/>
+      <path d="M24 28L42 16V32L24 44V28Z" fill="#1d83ff" opacity="0.5"/>
+      <path d="M24 28L6 16V32L24 44V28Z" fill="#1d83ff" opacity="0.65"/>
+    </svg>
+    <h1>d100 Battle Calculator</h1>
+  </header>
+  <main>
+    <section class="card controls">
+      <div class="row">
+        <div class="field">
+          <label for="attacker">Attacker units</label>
+          <input id="attacker" type="number" min="1" step="1" value="4" />
+        </div>
+        <div class="field">
+          <label for="defender">Defender units</label>
+          <input id="defender" type="number" min="1" step="1" value="2" />
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field">
+          <label for="seed">Seed (optional, for reproducible rolls)</label>
+          <input id="seed" type="text" placeholder="e.g. 20260307" />
+        </div>
+        <div class="btns">
+          <button id="rollBtn">Roll Battle</button>
+          <button class="secondary" id="rerollBtn">Reroll</button>
+          <button class="ghost" data-preset="1,1">1 vs 1</button>
+          <button class="ghost" data-preset="3,2">3 vs 2</button>
+          <button class="ghost" data-preset="4,2">4 vs 2</button>
+          <button class="ghost" data-preset="20,20">20 vs 20</button>
+          <button class="ghost" data-preset="30,3">30 vs 3</button>
+        </div>
+      </div>
+      <p class="note">Implements the unified d100 threshold model. Shows thresholds, rolls, successes, and survivors. Success dice are highlighted.</p>
+    </section>
+
+    <section class="card results">
+      <div class="grid">
+        <div class="panel" id="attPanel">
+          <h3>Attacker</h3>
+          <div class="kv"><span>Units</span><span id="attUnits">–</span></div>
+          <div class="kv"><span>Threshold</span><span id="attThreshold">–</span></div>
+          <div class="kv"><span>Successes</span><span id="attSuccesses">–</span></div>
+          <div class="kv"><span>Survivors</span><span id="attSurvivors">–</span></div>
+          <div class="dice-row" id="attDice"></div>
+        </div>
+        <div class="panel" id="defPanel">
+          <h3>Defender</h3>
+          <div class="kv"><span>Units</span><span id="defUnits">–</span></div>
+          <div class="kv"><span>Threshold</span><span id="defThreshold">–</span></div>
+          <div class="kv"><span>Successes</span><span id="defSuccesses">–</span></div>
+          <div class="kv"><span>Survivors</span><span id="defSurvivors">–</span></div>
+          <div class="dice-row" id="defDice"></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:12px">
+        <h3>Battle Summary</h3>
+        <div class="kv"><span>Roll Count</span><span id="rollCount">–</span></div>
+        <div class="kv"><span>Winner</span><span id="winner">–</span></div>
+      </div>
+      <div class="panel" style="margin-top:12px">
+        <h3>Steps</h3>
+        <div id="steps" class="steps">–</div>
+      </div>
+    </section>
+  </main>
+  <script src="dist/bundle.js"></script>
+</body>
+</html>
+
+
+

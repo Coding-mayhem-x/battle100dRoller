@@ -1,0 +1,12 @@
+﻿{
+  "name": "battleCalcOffline",
+  "private": true,
+  "type": "module",
+  "scripts": { 
+    "scenarios": "node scripts/run-scenarios.mjs"
+  , "build": "tsc -p tsconfig.json && node scripts/build-bundle.mjs" },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
+
